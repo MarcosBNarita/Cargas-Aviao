@@ -33,26 +33,33 @@ def perform_fitness(dia1, cen1, tra1, dia2, cen2, tra2, dia3, cen3, tra3, dia4, 
     cen4 = np.round(cen4)
     tra4 = np.round(tra4)
 
+    total = dia1 + dia2 + dia3 + dia4 + cen1 + cen2 + cen3 + cen4 + tra1 + tra2 + tra3 + tra4
+
     # define o fit baseado no valor máximo dado pelo professor
     fit = float((dia1 * 0.31 + cen1 * 0.31 + tra1 * 0.31 + dia2 * 0.38 + cen2 * 0.38 + tra2 * 0.38 + dia3 * 0.35 + cen3 * 0.35 + tra3 * 0.35 + dia4 * 0.285 + cen4 * 0.285 + tra4 * 0.285) / 12151.56)
     
     # define os limites de uso das cargas
-    h1 = np.maximum(0, float(((dia1+cen1+tra1) - (18000)) / (18000/10)))
-    h2 = np.maximum(0, float(((dia2+cen2+tra2) - (15000)) / (15000/10)))
-    h3 = np.maximum(0, float(((dia3+cen3+tra3) - (23000)) / (23000/10)))
-    h4 = np.maximum(0, float(((dia4+cen4+tra4) - (12000)) / (12000/10)))
+    h1 = np.maximum(0, float(((dia1+cen1+tra1) - (18000)) / (18000/13)))
+    h2 = np.maximum(0, float(((dia2+cen2+tra2) - (15000)) / (15000/13)))
+    h3 = np.maximum(0, float(((dia3+cen3+tra3) - (23000)) / (23000/13)))
+    h4 = np.maximum(0, float(((dia4+cen4+tra4) - (12000)) / (12000/13)))
 
     # define os limites de volume de cada compartimento
-    h5 = np.maximum(0, float(((dia1 * 0.48 + dia2 * 0.65 + dia3 * 0.58 + dia4 * 0.39) - 6800) / (6800/10)))
-    h6 = np.maximum(0, float(((cen1 * 0.48 + cen2 * 0.65 + cen3 * 0.58 + cen4 * 0.39) - 8700) / (8700/10)))
-    h7 = np.maximum(0, float(((tra1 * 0.48 + tra2 * 0.65 + tra3 * 0.58 + tra4 * 0.39) - 5300) / (5300/10)))
+    h5 = np.maximum(0, float(((dia1 * 0.48 + dia2 * 0.65 + dia3 * 0.58 + dia4 * 0.39) - 6800) / (6800/13)))
+    h6 = np.maximum(0, float(((cen1 * 0.48 + cen2 * 0.65 + cen3 * 0.58 + cen4 * 0.39) - 8700) / (8700/13)))
+    h7 = np.maximum(0, float(((tra1 * 0.48 + tra2 * 0.65 + tra3 * 0.58 + tra4 * 0.39) - 5300) / (5300/13)))
 
     # define os pesos maximos de cada compartimento
-    h8 = np.maximum(0, float(((dia1 + dia2 + dia3 + dia4) - 10000) / (10000/10)))
-    h9 = np.maximum(0, float(((cen1 + cen2 + cen3 + cen4) - 16000) / (16000/10)))
-    h10 = np.maximum(0, float(((tra1 + tra2 + tra3 + tra4) - 8000) / (8000/10)))
+    h8 = np.maximum(0, float(((dia1 + dia2 + dia3 + dia4) - 10000) / (10000/13)))
+    h9 = np.maximum(0, float(((cen1 + cen2 + cen3 + cen4) - 16000) / (16000/13)))
+    h10 = np.maximum(0, float(((tra1 + tra2 + tra3 + tra4) - 8000) / (8000/13)))
 
-    fit = fit - (h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9 + h10)
+    #define a restrição de proporção
+    h11 = np.maximum(0, float((((dia1 + dia2 + dia3 + dia4)/total) - 0.2941) / (0.2941/13)))
+    h12 = np.maximum(0, float((((cen1 + cen2 + cen3 + cen4)/total) - 0.4705) / (0.4705/13)))
+    h13 = np.maximum(0, float((((tra1 + tra2 + tra3 + tra4)/total) - 0.2352) / (0.2352/13)))
+
+    fit = fit - (h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9 + h10 + h11 + h12 + h13)
     return fit
 
 
@@ -123,10 +130,10 @@ def main():
 
     final_pop = ea.evolve(generator=generate_,
                           evaluator=evaluate_,
-                          pop_size=10000,
+                          pop_size=5000,
                           maximize=True,
-                          bounder=ec.Bounder(0, 16000),
-                          max_generations=1000,
+                          bounder=ec.Bounder(0, 26000),
+                          max_generations=10000,
                           num_inputs= 12,
                           crossover_rae = 1.0,
                           num_crossover_points = 1,
